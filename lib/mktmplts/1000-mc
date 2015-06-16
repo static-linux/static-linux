@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# squashfs-tools , not tested !! 
+
+make_mc()
+{ 
+if [[ -e "${src}"/mc ]]
+then echo ok
+else
+	cd "${src}"
+	#wget http://ftp.midnight-commander.org/mc-4.8.11.tar.xz
+	#tar -xvf mc-4.8.11.tar.xz
+	#rm mc-4.8.11.tar.xz
+	#mv mc-4.8.11 mc
+	wget http://ftp.midnight-commander.org/mc-4.6.2.tar.gz
+	tar -xvf mc-4.6.2.tar.gz
+        rm mc-4.6.2.tar.gz
+	mv mc-4.6.2 mc
+fi
+
+if [[ -e "${work}"/mc ]]
+then echo ok
+else rsync -avP "${src}"/mc "${work}" 
+	cd "${work}"/mc
+	#./configure --enable-static --host=x86_64-buildroot-linux-uclibc 
+	
+	#LD_LIBRARY_PATH=/home/blakor/public_html/Statix/Linux/ccc/brt/x86_64/output/host/usr
+	#make  $cores ${CCTYPE}
+       #	make ${CCTYPE}
+	#./configure --enable-static
+	#./configure --enable-maintainer-mode 
+	export CFLAGS="-static -O2 -g"
+	./configure --disable-shared
+	#./configure  --without-x --disable-shared --enable-static \
+    #CC='gcc -static -static-libgcc -fno-exceptions' \
+    #CXX='g++ -static -static-libgcc -fno-exceptions' \
+    #LDFLAGS='-Wl,-static -static -lc' \
+    #LIBS='-lc'
+	make -j8
+	cd $z
+fi
+}
+
+install_mc()
+{ 
+##
+make -C $work/mc  DESTDIR="${build}" install ${CCTYPE}
+}
+
+

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Buildroot creates a simple to use cross compiling
+# environment. 
+
+ARCHITEC=x86_64
+
+set_buildroot_env()
+{
+mkdir -p "$z/ccc/brt/${ARCHITEC}"
+if [[ -e $z/src/buildroot ]]
+	then echo ok
+	else git clone git://git.buildroot.net/buildroot "${src}"/buildroot/
+fi
+if [[ -e $z/ccc/brt/x86_64/* ]]
+	then echo ok
+	else rsync -avP "${src}/buildroot/"  "${z}/ccc/brt/${ARCHITEC}"
+fi
+
+cd "${z}/ccc/brt/${ARCHITEC}"
+
+cat > configs/my_defconfig << EOF
+BR2_x86_64=y
+BR2_CCACHE=y
+BR2_JLEVEL=$(( $(grep -c ^processor /proc/cpuinfo) * 2))
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_INET_IPV6=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y 
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+EOF
+
+make my_defconfig
+
+make
+
+cd "${z}"
+echo "Current PATH is $PATH"
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:${z}/ccc/brt/x86_64/output/host/usr/bin/
+echo "PATH now modified to $PATH"
+
+echo "CCTYPE is ${CCTYPE}"
+export CCTYPE="CC=x86_64-buildroot-linux-uclibc-gcc"
+echo "CCTYPE is now modified to ${CCTYPE}"
+
+echo "CPPTYPE is ${CPPTYPE}"
+export CPPTYPE="CXX=x86_64-buildroot-linux-uclibc-g++"
+echo "CPPTYPE is now modified to ${CPPTYPE}"
+
+}
+
+set_buildroot_altenv()
+{
+mkdir -p "$z/ccc/altbrt/${ARCHITEC}"
+if [[ -e $z/src/buildroot ]]
+        then echo ok
+        else git clone git://git.buildroot.net/buildroot "${src}"/buildroot/
+fi
+if [[ -e $z/ccc/brt/x86_64/* ]]
+        then echo ok
+        else rsync -avP "${src}/buildroot/"  "${z}/ccc/altbrt/${ARCHITEC}"
+fi
+
+cd "${z}/ccc/altbrt/${ARCHITEC}"
+
+
+cat > configs/my_defconfig <<EOF
+BR2_x86_64=y
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_DEFCONFIG="x86_64"
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+EOF
+cat >> configs/my_defconfig <<-EOF
+BR2_CCACHE=y
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_JLEVEL=$(( $(grep -c ^processor /proc/cpuinfo) * 2))
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_INET_IPV6=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y 
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+BR2_PREFER_STATIC_LIB=y
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PACKAGE_DROPBEAR=y
+BR2_PACKAGE_DROPBEAR=htop
+EOF
+
+make my_defconfig
+
+make
+}
+

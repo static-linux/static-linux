@@ -1,0 +1,51 @@
+#!/bin/bash
+
+make_nano()
+{
+if [[ -e "${src}"/nano ]]
+then echo ok
+else 
+cd "${src}"
+
+cp ~/.bldroot/nano-2.3.2.tar.gz .
+tar -xvf nano-2.3.2.tar.gz 
+rm nano-2.3.2.tar.gz
+mv nano-2.3.2 nano
+cd $z
+fi
+
+if [[ -e "${work}"/nano ]]
+then    echo ok
+else
+
+	rsync -avP "${src}"/nano "${work}"
+	cd $work/nano
+	#./autogen.sh
+	#./configure --disable-unicode --prefix="${build}" --enable-static "${CCTYPE}"
+	#./configure --disable-unicode --enable-static "${CCTYPE}"
+	#export CFLAGS="-static"
+	#./configure --disable-unicode --enable-static --host=x86_64-buildroot-linux-uclibc
+	export CFLAGS="-static"
+        #export LDFLAGS="-static"
+        #export CPPFLAGS="-static"
+	./configure --host=x86_64-buildroot-linux-uclibc
+	# --disable-unicode --enable-static
+	#./configure --disable-unicode -disable-shared --enable-static
+	#--enable-static --host=x86_64-buildroot-linux-uclibc
+	make -j8 "${CCTYPE}"
+	# "${CCTYPE}"
+        #LD_LIBRARY_PATH=/home/blakor/public_html/Statix/Linux/ccc/brt/x86_64/output/host/
+	#make  $cores "${CCTYPE}"
+	#LD_LIBRARY_PATH=/home/blakor/public_html/Statix/Linux/ccc/brt/x86_64/output/host/
+	cd "$z"
+
+fi
+}
+
+install_nano()
+{
+cd $work/nano
+make install
+}
+
+

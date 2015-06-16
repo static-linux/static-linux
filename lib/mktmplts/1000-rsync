@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# rsync , not done!!
+
+make_rsync()
+{ 
+if [[ -e "${work}"/rsync ]]
+then echo ok
+else
+	rsync -avP "${src}"/rsync "${work}" 
+	cd "${work}"/rsync
+	#export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/blakor/public_html/Musl/x86_64-linux-musl/bin
+	#export CFLAGS="-static"
+	#./configure --enable-static --host=x86_64-buildroot-linux-uclibc
+	#./configure --host=x86_64-buildroot-linux-uclibc
+	#CC="x86_64-linux-musl-gcc"
+	#./configure --host=x86_64-linux-musl
+	 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/blakor/public_html/Musl/x86_64-linux-musl/bin && ./configure --host=x86_64-linux-musl
+	make  $cores ${CCTYPE}
+	#./configure
+	#make
+	cd $z
+fi
+}
+install_rsync()
+{ 
+echo "not tested"
+make -C $work/rsync DESTDIR="${build}"
+
+}

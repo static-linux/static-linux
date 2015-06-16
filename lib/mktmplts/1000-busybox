@@ -1,0 +1,19 @@
+#!/bin/bash
+
+make_busybox()
+{
+
+
+if [[ -e "${work}"/busybox ]]
+then echo ok
+else
+	rsync -avP "${src}"/busybox "${work}"
+	make -C $work/busybox defconfig ${CCTYPE}
+	sed  -i 's|# CONFIG_STATIC is not set|CONFIG_STATIC=y|g'  $work/busybox/.config
+	make -C $work/busybox $cores ${CCTYPE}
+fi
+}
+install_busybox()
+{ 
+make -C $work/busybox CONFIG_PREFIX="${build}" install ${CCTYPE}
+}

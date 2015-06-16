@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# crosstool-ng cross compiling environment setting function
+set_crosstool_env()
+{
+if [[ -e $z/src/crosstool-ng ]]
+then echo ok
+else wget http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.9.3.tar.bz2 -P src
+tar xjf src/cross* --transform  "s|crosstool-ng-1.9.3|crosstool_ng|g" --absolute-names -C src
+fi
+
+if [[ -e $z/ccc/crs/x86_64/* ]]
+then echo ok
+else	mkdir -p "${z}"/ccc/crs/x86_64 
+	rsync -avP "${src}"/crosstool_ng/ "${z}"/ccc/crs/x86_64
+fi 
+
+cd "${z}"/ccc/crs/x86_64
+
+mkdir -p "${z}"/ccc/crs/x86_64b
+./configure --prefix=`pwd`
+
+}
+
+

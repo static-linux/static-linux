@@ -1,0 +1,23 @@
+#!/bin/bash
+
+make_bash()
+{
+if [[ -e "${work}"/bash ]]
+then echo ok
+else
+        rsync -avP "${src}"/bash "${work}"
+        cd "${work}"/bash/
+        ./configure --enable-static-link --without-bash-malloc --prefix="${build}"
+        cd $z
+        mkdir  $work/bash.gnu
+        cd $work/bash.gnu
+        # not tested 
+        make -C "${work}"/bash $cores
+fi
+}
+
+install_bash()
+{
+make -C $work/bash install
+}
+

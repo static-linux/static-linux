@@ -1,0 +1,30 @@
+#!/bin/bash
+
+configure_linux()
+{
+if [[ -e "${work}"/linux ]]
+then echo ok
+else
+rsync -avP "${src}"/linux "${work}"
+rsync -avP $z/lib/linux-defconfigs/defconfig_x86_64_2 "${work}"/linux/def.config
+echo CONFIG_INITRAMFS_SOURCE=\""$z/build"\" >>  "${work}"/linux/def.config
+#echo CONFIG_INITRAMFS_SOURCE=\""$z/work/x86_64_statics/output/images/rootfs.cpio"\" >>  "${work}"/linux/def.config
+make -C "${work}"/linux allnoconfig KCONFIG_ALLCONFIG=def.config
+fi
+}
+
+make_linux()
+{
+#make -C "${work}"/linux menuconfig 
+rm "${work}"/linux/usr/initramfs_data.cpio.gz
+time make -C "${work}"/linux $cores
+}
+
+install_linux()
+{
+make -C "${work}"/linux INSTALL_PATH="${build}/boot" install
+cd "${build}"/boot
+ln  vmlinu*  vmlinux
+cd $z
+}
+

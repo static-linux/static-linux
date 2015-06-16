@@ -1,0 +1,24 @@
+#!/bin.bash
+
+make_coreutils()
+{
+if [[ -e "${work}"/busybox ]]
+then echo ok
+else
+        rsync -avP "${src}"/coreutils "${work}"
+        # ./configure  --enable-static
+        cd ${work}/coreutils
+        ./bootstrap
+        ./configure  --enable-static --prefix="${build}"
+        mkdir  $work/coreutils.gnu
+        cd $work/coreutils.gnu
+        make -C $work/coreutils $cores
+        cd $z
+fi
+}
+
+install_coreutils()
+{
+make -C $work/coreutils install
+}
+

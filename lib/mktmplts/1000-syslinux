@@ -1,0 +1,22 @@
+#!/bin/bash
+
+make_syslinux()
+{
+if [[ -e "${work}"/syslinux ]]
+then echo ok
+else 
+	rsync -avP "${src}"/syslinux "${work}" 
+	export CFLAGS="-static"
+        #export LDFLAGS="-static"
+       # export CPPFLAGS="-static"
+
+	make -C $work/syslinux $cores
+	cp $work/syslinux/com32/menu/vesamenu.c32 "${build}/boot"
+fi
+}
+
+install_syslinux()
+{
+#not yet working
+make -C $work/syslinux install # maybe .. DESTDIR= ?
+}

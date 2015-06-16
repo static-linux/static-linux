@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# squashfs-tools , not tested !! 
+
+make_squashfs_tools()
+{ 
+if [[ -e "${work}"/squashfs_tools ]]
+then echo ok
+else
+	rsync -avP "${src}"/squashfs_tools "${work}" 
+	make -C $work/squashfs_tools $cores ${CCTYPE}
+fi
+}
+
+install_squashfs_tools()
+{ 
+## INSTALL_DIR = /usr/local/bin 
+make -C $work/squashfs_tools  INSTALL_DIR="${build}/usr/local/bin" install ${CCTYPE}
+}

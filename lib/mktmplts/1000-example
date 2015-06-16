@@ -1,0 +1,15 @@
+#!/bin/bash
+
+make_example()
+{ 
+if [[ -e "${work}"/example ]]
+then echo ok
+else
+	rsync -avP "${src}"/example "${work}" 
+	make -C $work/example $cores ${CCTYPE}
+fi
+}
+install_example()
+{ 
+make -C $work/example CONFIG_PREFIX="${build}" install ${CCTYPE}
+}

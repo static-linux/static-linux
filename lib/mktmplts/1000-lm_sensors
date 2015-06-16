@@ -1,0 +1,16 @@
+#!/bin/bash
+
+make_lm_sensors()
+{ 
+if [[ -e "${work}"/lm_sensors ]]
+then echo ok
+else
+	rsync -avP "${src}"/lm_sensors "${work}" 
+	make -C $work/lm_sensors $cores ${CCTYPE}
+fi
+}
+install_lm_sensors()
+{ 
+make install DESTDIR="${build}"
+
+}

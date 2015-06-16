@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# (C) 2014, pkg_stx, cgraf GPL License
+# A simple package manager for static binaries.
+
+
+WORKDR=/var/pkg_stx/work/ 
+MIRROR="http://www.csit.parkland.edu/~cgraff1/statix/i386" 
+MTADTA="/var/pkg_stx/work/METADATA"
+DTABSE=/var/pkg_stx/database/ 
+PKGNAM=$( grep -o ${2}-'...*' $MTADTA ) 2>/dev/null 
+
+. /etc/pkg_stx/config 2>/dev/null
+
+
+mkdir -p "$WORKDR" "$DTABSE" 
+cd "$WORKDR"
+
+case $1 in 
+ download) wget "${MIRROR}/${PKGNAM}.tar.gz"
+           ;; 
+  install) wget -O- "${MIRROR}/${PKGNAM}.tar.gz"| gunzip -c | tar xf - || exit 1 
+           mkdir -p "${DTABSE}/${PKGNAM}" 
+           cd "$PKGNAM" 
+           cp checksums "${DTABSE}/${PKGNAM}/checksums" 
+           . checksums
+           installd 
+           cd "$WORKDR" 
+           A=$( md5sum "${PKGNAM}/${2}" | awk '{ print $1}' ) 
+           B=$( grep " ${2}" "$MTADTA" | awk 'NR==2{ print $2}') 
+           echo "Verify checksums: ${A} ....  ${B}" 
+           [ "$A" = "$B" ] && echo "Checksums match"
+           [ "$A" = "$B" ] || echo "Checksum mismatch." 
+           rm -rf "$PKGNAM" 
+           ;; 
+   remove) if [ -e "${DTABSE}/${PKGNAM}/checksums" ]
+           then . "${DTABSE}/${PKGNAM}/checksums" 
+                removed 
+                cd "$DTABSE"
+                rm -rf "$PKGNAM"
+                cd "$WORKDR"
+           else echo "Does not appear to have been installed by pkg_stx"
+           fi
+           ;;
+   search) grep "$2" "$MTADTA" 
+           ;;
+   update) wget  -O "$MTADTA"  "${MIRROR}/METADATA" 
+           ;;
+      src) wget -qO- "${MIRROR}/${PKGNAM}.src" | tar xvf - || exit 1 
+           ;;
+        *) echo "Usage: pkg_stx [update|install|search|remove] <package name>" 
+           ;; 
+esac
+
+
+
+
+

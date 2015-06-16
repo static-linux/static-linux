@@ -1,0 +1,15 @@
+#!/bin/bash
+
+make_pciutils()
+{ 
+if [[ -e "${work}"/pciutils ]]
+then echo ok
+else
+	rsync -avP "${src}"/pciutils "${work}" 
+	make -C $work/pciutils $cores ${CCTYPE}
+fi
+}
+install_pciutils()
+{ 
+echo filler
+}

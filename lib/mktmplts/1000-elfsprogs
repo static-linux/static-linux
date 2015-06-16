@@ -1,0 +1,16 @@
+#!/bin/bash
+
+make_elfsprogs()
+{ 
+if [[ -e "${work}"/elfsprogs ]]
+then echo ok
+else
+	rsync -avP "${src}"/elfsprogs "${work}" 
+	./configure
+	make -C $work/elfsprogs $cores ${CCTYPE}
+fi
+}
+install_elfsprogs()
+{ 
+echo filler 
+}

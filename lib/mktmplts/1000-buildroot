@@ -1,0 +1,354 @@
+#!/bin/bash
+
+make_buildroot_raspi()
+{
+if [[ -e "${work}"/buildroot_raspi ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/buildroot_raspi
+fi
+cd "${work}"/buildroot_raspi
+cat > configs/my_defconfig <<-EOF
+BR2_CCACHE=y
+BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo) 
+BR2_DL_DIR="/home/$USER/.bldroot"
+EOF
+
+
+cat >> configs/my_defconfig <<-EOF
+BR2_arm=y
+BR2_arm1176jzf_s=y 
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y 
+BR2_TARGET_GENERIC_GETTY_PORT="tty1" 
+BR2_PACKAGE_RPI_FIRMWARE=y
+BR2_PACKAGE_RPI_USERLAND=y
+BR2_PACKAGE_LIBCOFI=y
+BR2_KERNEL_HEADERS_VERSION=y
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_GIT=y
+BR2_LINUX_KERNEL_CUSTOM_REPO_URL="git://github.com/raspberrypi/linux.git"
+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="ab2ed0dbf37e8d397e60f37621629082da75cd58"
+BR2_LINUX_KERNEL_USE_DEFCONFIG=y
+BR2_LINUX_KERNEL_DEFCONFIG="bcmrpi_quick"
+BR2_LINUX_KERNEL_ZIMAGE=y
+EOF
+make my_defconfig
+make
+}
+
+
+
+make_x86_64_xorg()
+{
+if [[ -e "${work}"/x86_64_xorg ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/x86_64_xorg
+fi
+cd "${work}"/x86_64_xorg 
+cat > configs/my_defconfig << EOF
+BR2_x86_64=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+BR2_CCACHE=y
+BR2_TARGET_ROOTFS_CPIO=y
+BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo)
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+
+BR2_TARGET_GENERIC_GETTY_PORT="tty1" 
+BR2_PACKAGE_XORG7=y
+BR2_PACKAGE_XAPP_TWM=y
+BR2_PACKAGE_XAPP_SETXKBMAP=y
+BR2_PACKAGE_XAPP_XINIT=y
+BR2_PACKAGE_XAPP_XINPUT=y
+BR2_PACKAGE_XSERVER_XORG_SERVER=y
+BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR=y
+BR2_PACKAGE_XDRIVER_XF86_INPUT_EVDEV=y
+BR2_PACKAGE_XDRIVER_XF86_INPUT_KEYBOARD=y
+BR2_PACKAGE_XDRIVER_XF86_INPUT_MOUSE=y
+BR2_PACKAGE_XDRIVER_XF86_VIDEO_CIRRUS=y
+BR2_PACKAGE_XDRIVER_XF86_VIDEO_FBDEV=y
+BR2_PACKAGE_XDRIVER_XF86_VIDEO_VESA=y
+BR2_PACKAGE_LIBERATION=y
+BR2_PACKAGE_XTERM=y
+BR2_PACKAGE_MAKEDEVS=y
+BR2_PACKAGE_NCURSES_TARGET_PANEL=y
+BR2_PACKAGE_NCURSES_TARGET_FORM=y
+BR2_PACKAGE_NCURSES_TARGET_MENU=y
+BR2_PACKAGE_ALSA_UTILS=y
+EOF
+make my_defconfig
+make
+}
+
+
+
+make_x86_static_min()
+{
+if [[ -e "${work}"/x86_statics_min ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/x86_statics_min
+cd "${work}"/x86_statics_min
+cat > configs/my_defconfig <<EOF
+BR2_x86_generic=y
+BR2_CCACHE=y
+BR2_TARGET_ROOTFS_CPIO=y
+BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo)
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_DEFCONFIG="i386"
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PACKAGE_AIRCRACK_NG=y
+BR2_PREFER_STATIC_LIB=y
+EOF
+make my_defconfig 
+make
+fi
+}
+
+make_static_arm()
+{
+# This is still in progress!! 
+# Needs improved, does not work !!
+if [[ -e "${work}"/static_arm ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/static_arm
+cd "${work}"/static_arm
+cat > configs/my_defconfig <<EOF 
+BR2_CCACHE=y
+BR2_TARGET_ROOTFS_CPIO=y
+BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo)
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_TARGET_ROOTFS_INITRAMFS=y
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_INET_IPV6=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+BR2_TOOLCHAIN_BUILDROOT_USE_SSP=y
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PREFER_STATIC_LIB=y
+EOF
+make my_defconfig 
+#make menuconfig 
+make linux-menconfig
+make
+fi
+}
+
+make_x86_64_statics_min()
+{
+
+
+if [[ -e "${work}"/x86_64_statics_min ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/x86_64_statics_min
+cd "${work}"/x86_64_statics_min
+
+cat > configs/my_defconfig <<EOF
+BR2_x86_64=y
+BR2_TARGET_ROOTFS_CPIO=y
+BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo)
+BR2_DL_DIR="/home/$USER/.bldroot"
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_DEFCONFIG="x86_64" 
+BR2_TARGET_GENERIC_GETTY_PORT="tty0"
+BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PREFER_STATIC_LIB=y
+EOF
+make my_defconfig
+#make menuconfig
+#make linux-menuconfig
+#make linux-savedefconfig
+#make savedefconfig
+make
+fi
+
+}
+make_busybox_x86_64()
+{ 
+	echo empty
+	exit
+} 
+
+make_buildroot_expero()
+{
+
+# this is a modularied 
+# system for applying bldrt configs
+if [[ -e "${work}"/x86_expero3 ]]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/ "${work}"/x86_expero3
+fi
+cd "${work}"/x86_expero3 
+#cat > configs/my_defconfig <<-EOF
+#BR2_x86=y 
+#BR2_LINUX_KERNEL=y
+#BR2_LINUX_KERNEL_DEFCONFIG="i386"
+#EOF
+
+#cat > configs/my_defconfig <<-EOF
+#BR2_arm=y
+#BR2_arm1176jz_s=y
+#EOF 
+
+#cat >> configs/my_defconfig <<-EOF
+#BR2_CCACHE=y
+#BR2_TARGET_ROOTFS_CPIO=y
+#BR2_JLEVEL=8
+#BR2_DL_DIR="/home/$USER/.bldroot"
+#BR2_TARGET_GENERIC_GETTY_PORT="tty1"
+#BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y 
+#BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+#BR2_TOOLCHAIN_BUILDROOT_CXX=y
+#BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+#BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+#BR2_PREFER_STATIC_LIB=y
+#BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+#BR2_PACKAGE_DROPBEAR=y
+#EOF
+#cp "${z}/lib/busybox-defconfigs/busybox.defconfig" package/busybox/busybox-1.22.x.config
+cp "${z}/lib/busybox-defconfigs/busybox.defconfig" package/busybox/busybox-1.23.x.config
+
+
+
+
+cat >> configs/my_defconfig <<EOF
+BR2_x86=y
+BR2_TOOLCHAIN_BUILDROOT_MUSL=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.0.5"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
+BR2_DL_DIR="/home/blakor/.bldroot"
+BR2_JLEVEL=8
+BR2_CCACHE=y
+BR2_STATIC_LIBS=y
+EOF
+
+make my_defconfig
+
+make
+
+
+COUNT="1"
+HOLD=`pwd`
+for q in `cat "${z}"/lib/bldrt/SMALL_REPO`
+do 	cat configs/my_defconfig > configs/my2_defconfig
+	echo "$q" >> configs/my2_defconfig
+	make my2_defconfig 
+	make 
+done
+}
+
+
+ARCHITECTURE=x86_64
+make_buildroot_x86_64_busybox()
+{
+if [ -e "${work}/${ARCHITECTURE}_statix3"  ]
+then    echo ok 
+else    rsync -avP "${src}"/buildroot/  "${work}/${ARCHITECTURE}_statix3"
+fi
+cd "${work}/${ARCHITECTURE}_statix3"
+
+# this conditions for the "i386" defconfig (should be replaced)
+
+ARCHITECTURETAG="$ARCHITECTURE"
+#if [ "$ARCHITECTURE" = "x86" ]
+#then ARCHITECTURETAG=i386
+#fi
+
+
+#cat > configs/my_defconfig <<EOF
+#BR2_${ARCHITECTURE}=y
+#BR2_LINUX_KERNEL=y
+#BR2_LINUX_KERNEL_DEFCONFIG="$ARCHITECTURETAG"
+#BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+#EOF
+#cat > configs/my_defconfig <<EOF
+#BR2_${ARCHITECTURE}=y
+#BR2_LINUX_KERNEL=y
+#BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+#BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
+#BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+#EOF
+
+#cat >> configs/my_defconfig <<EOF
+#BR2_CCACHE=y
+#BR2_DL_DIR="/home/$USER/.bldroot"
+#BR2_JLEVEL=$(( $(grep -c ^processor /proc/cpuinfo) * 2))
+#BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
+#BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
+#BR2_TOOLCHAIN_BUILDROOT_CXX=y
+#BR2_TOOLCHAIN_BUILDROOT_INET_RPC=y
+#BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
+#BR2_PREFER_STATIC_LIB=y
+#BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+#BR2_PACKAGE_DROPBEAR=y
+#EOF
+mkdir -p /home/blakor/musl_host_amd
+mkdir -p /home/blakor/musl_build_amd
+mkdir -p /home/blakor/musl_target_amd
+mkdir -p /home/blakor/musl_staging_amd
+mkdir -p /home/blakor/musl_binaries_amd
+mkdir -p /home/blakor/musl_base_amd/
+#BR2_STAGING_DIR="/home/blakor/musl_staging_amd"
+# BR2_BUILD_DIR="/home/blakor/musl_build_amd"
+#BR2_BINARIES_DIR="/home/blakor/musl_binaries_amd"
+# BR2_HOST_DIR="/home/blakor/musl_host_amd"
+# BR2_TARGET_DIR="/home/blakor/musl_target_amd"
+cat >> configs/my_defconfig <<EOF
+BR2_x86_64=y
+BR2_DL_DIR="/home/blakor/.bldroot"
+BR2_JLEVEL=8
+BR2_CCACHE=y
+BR2_PREFER_STATIC_LIB=y
+BR2_TOOLCHAIN_BUILDROOT_MUSL=y
+BR2_TOOLCHAIN_BUILDROOT_CXX=y
+BR2_LINUX_KERNEL=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+BR2_LINUX_KERNEL_DEFCONFIG="x86_64"
+BR2_PACKAGE_BUSYBOX_SHOW_OTHERS=y
+BR2_PACKAGE_DROPBEAR=y
+BR2_PACKAGE_HTOP=y
+EOF
+# BUILD_DIR="/home/blakor/statix2"
+#/home/blakor/Statix/Linux/work/x86_tuesday/output/build/linux-3.14.4/defconfig
+# SAVE this copies in the busybox defconfig file
+#cp "${z}/DEFCONFIG" package/busybox/busybox-1.22.x.config
+  # package/busybox/busybox-1.22.x.config
+
+
+#make my_defconfig TARGET_DIR="/home/blakor/musl_target_amd" HOST_DIR="/home/blakor/musl_host_amd"  BUILD_DIR="/home/blakor/musl_build_amd" BINARIES_DIR="/home/blakor/musl_binaries_amd"
+
+#make busybox-menuconfig
+#make busybox
+
+
+
+
+#make TARGET_DIR="/home/blakor/musl_target_amd" HOST_DIR="/home/blakor/musl_host_amd"  BUILD_DIR="/home/blakor/musl_build_amd" BINARIES_DIR="/home/blakor/musl_binaries_amd"
+
+} 

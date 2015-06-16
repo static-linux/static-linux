@@ -1,0 +1,15 @@
+#!/bin/bash
+
+make_cpufrequtils()
+{ 
+if [[ -e "${work}"/cpufrequtils ]]
+then echo ok
+else
+	rsync -avP "${src}"/cpufrequtils "${work}" 
+	make -C $work/cpufrequtils $cores ${CCTYPE}
+fi
+}
+install_cpufrequtils()
+{ 
+echo filler 
+}

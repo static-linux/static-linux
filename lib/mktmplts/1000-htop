@@ -1,0 +1,40 @@
+#!/bin/bash
+
+make_htop()
+{
+if [[ -e "${work}"/htop ]]
+then    echo ok
+else
+
+	rsync -avP "${src}"/htop "${work}"
+	cd $work/htop
+	#./autogen.sh
+	#./configure --disable-unicode --prefix="${build}" --enable-static "${CCTYPE}"
+	#./configure --disable-unicode --enable-static "${CCTYPE}"
+	#export CFLAGS="-static"
+	#./configure --disable-unicode --enable-static --host=x86_64-buildroot-linux-uclibc
+	#export CFLAGS="-static"
+        #export LDFLAGS="-static"
+        #export CPPFLAGS="-static"
+	
+	#./configure --disable-unicode --enable-static
+	#./configure --disable-unicode -disable-shared --enable-static
+	#--enable-static --host=x86_64-buildroot-linux-uclibc
+	./configure  --disable-unicode --enable-static
+	make -j8
+	# "${CCTYPE}"
+        #LD_LIBRARY_PATH=/home/blakor/public_html/Statix/Linux/ccc/brt/x86_64/output/host/
+	#make  $cores "${CCTYPE}"
+	#LD_LIBRARY_PATH=/home/blakor/public_html/Statix/Linux/ccc/brt/x86_64/output/host/
+	cd "$z"
+
+fi
+}
+
+install_htop()
+{
+cd $work/htop
+make install
+}
+
+

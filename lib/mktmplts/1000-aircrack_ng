@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# aircrack-ng , not done !! 
+
+make_aircrack_ng()
+{ 
+if [[ -e "${work}"/aircrack_ng ]]
+then echo ok
+else
+	rsync -avP "${src}"/aircrack_ng "${work}" 
+	make -C $work/aircrack_ng $cores ${CCTYPE}
+fi
+}
+install_aircrack_ng()
+{ 
+echo filler 
+}

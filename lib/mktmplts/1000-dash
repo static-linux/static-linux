@@ -1,0 +1,25 @@
+#!/bin/bash
+
+make_dash()
+{ 
+if [[ -e "${work}"/dash ]]
+then echo ok
+else rsync -avP "${src}"/dash "${work}" 
+
+	cd "${work}"/dash
+
+	#./autogen.sh
+	#./configure --enable-static 
+	
+	#make  $cores ${CCTYPE}
+	export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/home/blakor/public_html/Musl/x86_64-linux-musl/bin
+	./configure --host=x86_64-linux-musl --enable-static
+	make  $cores CC="x86_64-linux-musl-gcc"
+	
+	cd "$z"
+fi
+}
+install_dash()
+{ 
+make -C $work/dash CONFIG_PREFIX="${build}" install ${CCTYPE}
+}

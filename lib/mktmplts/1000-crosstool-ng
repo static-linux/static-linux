@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+configure_crosstool_ng()
+{
+# not done
+if [[ -e "${work}"/crosstool_ng ]]
+then echo ok
+else rsync -avP "${src}"/crosstool_ng "${work}"
+fi
+}
+
+make_crosstool_ng()
+{
+# not done 
+cd $work/crosstool_ng
+./configure --prefix="${work}"
+make
+./ct-ng help
+ct-ng list-samples
+#echo read statement inserted for debug
+#read waitvar
+# ct-ng show-arm-unknown-linux-gnueabi
+# ct-ng arm-unknown-linux-gnueabi
+# export PATH="${PATH}:${HOME}/x-tools/arm-unknown-linux-gnueabi/bin"
+# arm-unknown-linux-gnueabi-gcc
+# ct-ng menuconfig
+# ct-ng build
+}
+
+install_crosstool_ng()
+{
+# not done 
+make install
+export PATH="${PATH}:${work}/bin"
+}
+
+stage2_crosstool_ng()
+{
+# not done 
+mkdir -p $work/crosstool_ng-stage2
+cd $work/crosstool_ng-stage2
+}
+

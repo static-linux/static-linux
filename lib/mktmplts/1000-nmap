@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# nmap, not tested!!
+
+
+make_nmap()
+{ 
+if [[ -e "${work}"/nmap ]]
+then echo ok
+else
+	rsync -avP "${src}"/nmap "${work}"
+	./configure --disable-unicode --prefix="${install_path}"
+	make -C $work/example $cores ${CCTYPE}
+
+
+fi
+}
+
+install_nmap()
+{ 
+make -C $work/nmap install ${CCTYPE}
+}

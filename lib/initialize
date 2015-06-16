@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Initialize Statix 
+
+initialize()
+{
+z="$(pwd)"
+
+fs="${z}/fs"
+
+src="${z}/src" 
+
+work="${z}/work"
+
+mnt="${work}/mnt"
+
+build="${z}/build"
+
+cores="-j$(grep -c ^pro* /p*/cp*)"
+
+#rsync -avP $z/lib/system-skeleton/ "${build}"
+
+#mkdir -p "${fs}" "${src}" "${work}" "${mnt}"
+mkdir -p "${src}" "${work}" "${mnt}"
+
+for i in "${z}"/lib/*tmplts/????-* 
+do 	. "${i}" 
+done
+}
+
