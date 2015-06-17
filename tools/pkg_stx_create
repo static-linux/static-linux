@@ -20,135 +20,151 @@ cd "${BILDPRNT}"
 
 
 for i in *
-do case "$i" in
-       git-*) echo "Not copied" ;;
- toolchain-*) echo "Not copied" ;;
-     #  linu*) echo "Not copied" ;;
-       lib*) echo "This is a library, not copied" ;;
-      uclib*) echo "Not copied" ;;
-       buil*) echo "Not copied" ;;
-      host-*) echo "Not copied" ;;
-     lib-ho*) echo "Not copied" ;;
-        _us*) echo "Not copied" ;;
+do 
+	case "$i" in
+       git-*) 	
+		echo "Not copied" 
+		;;
+ toolchain-*) 
+		echo "Not copied" 
+		;;
+     #  linu*) 	echo "Not copied" ;;
+       lib*) 
+		echo "This is a library, not copied" 
+		;;
+      uclib*) 
+		echo "Not copied" 
+		;;
+       buil*) 
+		echo "Not copied" 
+		;;
+      host-*) 
+		echo "Not copied" 
+		;;
+     lib-ho*) 
+		echo "Not copied" 
+		;;
+        _us*) 
+		echo "Not copied" 
+		;;
            *)
 
-        if [ -e "${DESTPRNT}/${i}" ]
-	then echo "${i} exists, skipping." 
-        else echo "creating ${i} ....   ."
+        	if [ -e "${DESTPRNT}/${i}" ]
+		then 	echo "${i} exists, skipping." 
+        	else 	echo "creating ${i} ....   ." 
+			cd "${DESTPRNT}" 
 	
-	cd "${DESTPRNT}" 
-        # mkdir -p "${DESTPRNT}/${i}"
-        # This should probably be arg 3
-        # cp ~/.bldroot/"${i}"* "${DESTPRNT}/${i}".src  
-        
-	
-	for j in `find "${BILDPRNT}/${i}" \
-		  -not -name "example"       \
-                   -not -name "a.out"       \
-                   -not -name "*.c"       \
-                   -not -name "files.*"   \
-                   -not -name "*.bin"     \
-                   -not -name "*.elf"     \
-                   -not -name "*.dbg"     \
-                   -not -name "*.so"      \
-                   -not -name "*.sh"      \
-                   -not -name "*.pl"      \
-                   -not -name "*-sh"      \
-                   -not -name "rules"     \
-                   -not -name "Test-"     \
-                   -not -name "compile"   \
-                   -not -name "config.*"  \
-                   -not -name "useles*"   \
-                   -not -name "missing"   \
-                   -not -name "depcomp"   \
-                   -not -name "*-config"  \
-                   -not -name "configure" \
-                   -not -name "busybox_unstripped" \
-                   -not -name ".*" \
-                   -not -name "mkinstalldirs" \
-                   -type f -perm -o+rx`
-        do if [ "$(file "${j}" | grep ELF | awk '{print $2}' )" = "ELF" ] 
-           then if [ "$(file "${j}" | grep "statically" )" ]
-                then mkdir -p  "${DESTPRNT}/${i}"
-                     cp "${j}" "${DESTPRNT}/${i}" 
-                     cp ~/.bldroot/"${i}"* "${DESTPRNT}/${i}".src
-                else echo "skipping, not statically linked." 
-                fi
-           else echo not an ELF
-           fi 
-        done
-        fi 
+			for j in `find "${BILDPRNT}/${i}" \
+		  		-not -name "example"       \
+                   		-not -name "a.out"       \
+                   		-not -name "*.c"       \
+                   		-not -name "files.*"   \
+                   		-not -name "*.bin"     \
+                   		-not -name "*.elf"     \
+                   		-not -name "*.dbg"     \
+                   		-not -name "*.so"      \
+                   		-not -name "*.sh"      \
+                   		-not -name "*.pl"      \
+                   		-not -name "*-sh"      \
+                   		-not -name "rules"     \
+                   		-not -name "Test-"     \
+                   		-not -name "compile"   \
+                   		-not -name "config.*"  \
+                   		-not -name "useles*"   \
+                   		-not -name "missing"   \
+                   		-not -name "depcomp"   \
+                   		-not -name "*-config"  \
+                   		-not -name "configure" \
+                   		-not -name "busybox_unstripped" \
+                   		-not -name ".*" \
+                   		-not -name "mkinstalldirs" \
+                   		-type f -perm -o+rx`
+        		do 	if [ "$(file "${j}" | grep ELF | awk '{print $2}' )" = "ELF" ] 
+           			then 	if [ "$(file "${j}" | grep "statically" )" ]
+                			then 	mkdir -p  "${DESTPRNT}/${i}"
+                           			cp "${j}" "${DESTPRNT}/${i}" 
+                           			cp ~/.bldroot/"${i}"* "${DESTPRNT}/${i}".src 
+                			else echo "skipping, not statically linked." 
+                			fi
+           				else echo not an ELF
+           			fi 
+        		done
+        	fi 
 	
 
 
-        if [ -d "${DESTPRNT}/${i}" ]
-        then 
-            
-        # Configure the metadata files.
-	cd "${DESTPRNT}/${i}"
-        #cd "${BILDPRNT}/${i}"
-        echo                   >> "checksums"
-	echo "# Statix pkg"    >> "checksums"
-        echo                   >> "checksums"
-	echo "# ${i}"          >> "checksums"
+        	if [ -d "${DESTPRNT}/${i}" ]
+        	then 
+            		HOLD_DATE="$(date)"
+        		# Configure the metadata files.
+			cd "${DESTPRNT}/${i}"
+        		#cd "${BILDPRNT}/${i}"
+        		echo                   >> "checksums"
+			echo "# Statix pkg"    >> "checksums"
+        		echo                   >> "checksums"
+			echo "# ${i}"          >> "checksums"
 
-        echo                   >> ../METADATA
-        echo                   >> ../METADATA
-        echo                   >> ../METADATA
-        echo "# ${i}"          >> ../METADATA 
+        		echo                   >> ../METADATA
+        		echo                   >> ../METADATA
+        		echo                   >> ../METADATA
+        		echo "# ${i}"          >> ../METADATA 
 
-	echo "# $(date)"       >> "checksums" 
+			echo "# $HOLD_DATE"    >> "checksums" 
 
-        echo "# $(date)"       >> ../METADATA
+        		echo "# $HOLD_DATE"    >> ../METADATA
 
-	echo                   >> "checksums"
-        echo "DESTDIR=/bin"    >> "checksums"
-        echo                   >> "checksums"
-        echo                   >> "checksums" 
-        echo                   >> "checksums"
-        printf '\n'            >> "checksums"
+			echo                   >> "checksums"
+        		echo "DESTDIR=/bin"    >> "checksums"
+        		echo                   >> "checksums"
+        		echo                   >> "checksums" 
+        		echo                   >> "checksums"
+        		printf '\n'            >> "checksums"
         
 
-        ## Create "installd" function of the packages metadata file.
-        echo "installd(){"                  >> "checksums"
-        echo "mkdir -p \"\$DESTDIR\""       >> "checksums"
+        		## Create "installd" function of the packages metadata file.
+        		echo "installd(){"                  >> "checksums"
+        		echo "mkdir -p \"\$DESTDIR\""       >> "checksums"
 
-	for k in * ; do case "$k" in 
-	checksums ) ;;
-	*) /bin/busybox echo -n "# "        >> "checksums"
-           md5sum "$k"                      >> "checksums"
-           echo "install $k \"\$DESTDIR\""  >> "checksums"
-           ;;
+			for k in *
+			do 	case "$k" in 
+				checksums ) 
+					;;
+					*) 
+						echo -n "# "        >> "checksums"
+						md5sum "$k"                      >> "checksums"
+           					echo "install $k \"\$DESTDIR\""  >> "checksums"
+           				;;
+				esac 
+			done 
+
+        		echo "}">> "checksums" 
+        		## Create "removed" function of the packages metadata file
+        		echo "removed(){" >> "checksums"
+
+        		for k in *
+			do 
+				case "$k" in 
+      	  			checksums ) 
+					;;
+        				*) 	echo -n "# " >> "checksums"
+           					echo -n "# " >> ../METADATA
+      	    		 			md5sum "$k"  >> "checksums"
+           					md5sum "$k"  >> ../METADATA
+    			       			echo "rm \"\$DESTDIR\"/${k}" >> "checksums"
+           				;;
+        			esac 
+        		done 
+
+        		echo "}" >> "checksums" 
+
+
+        		# Archive and/or compress the package.
+			cd "${DESTPRNT}"
+        		tar -a -cf "${i}".tar.gz "${i}" 
+			cd "${BILDPRNT}"
+        		else echo ok
+        	fi
+
 	esac 
-	done 
-
-        echo "}"                            >> "checksums"
-
-
-        ## Create "removed" function of the packages metadata file
-        echo "removed(){"                   >> "checksums"
-
-        for k in * ; do case "$k" in 
-        checksums ) ;;
-        *) /bin/busybox echo -n "# "        >> "checksums"
-           /bin/busybox echo -n "# "        >> ../METADATA
-           md5sum "$k"                      >> "checksums"
-           md5sum "$k"                      >> ../METADATA
-           echo "rm \"\$DESTDIR\"/${k}"     >> "checksums"
-           ;;
-        esac 
-        done 
-
-        echo "}"                            >> "checksums" 
-
-
-        # Archive and/or compress the package.
-	cd "${DESTPRNT}"
-        tar -a -cf "${i}".tar.gz "${i}" 
-	cd "${BILDPRNT}"
-        else echo ok
-        fi
-
-esac 
 done
 

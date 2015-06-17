@@ -14,7 +14,7 @@ DEVICMNT="$(pwd)/control"
 
 BUILDDIR="$(pwd)/control" 
 
-ARCHITEC=x86_64
+ARCHITEC=i386
 
 BACKHOME=$(pwd)
 
@@ -23,6 +23,12 @@ KERNTYPE=bzImage
 KERNVERS=3.14.4
 
 VERSNUMB=0.6.4 # version number for release 
+
+
+# chmod various files to harden security.
+HARDEN=YES
+
+
 
 
 # clean up the build directory.
@@ -55,7 +61,7 @@ null::sysinit:/etc/rc.d/syslogd start
 null::sysinit:/etc/rc.d/klogd start
 EOF
 
-
+[ "$HARDEN" = "YES" ] && chmod 400 "${BUILDDIR}"/etc/inittab
 
 
 cat >> "${BUILDDIR}"/etc/rc.d/diskmond << EOF
@@ -176,7 +182,7 @@ esac
 EOF
 
 chmod +x "${BUILDDIR}"/etc/rc.d/*
-
+[ "$HARDEN" = "YES" ] && chmod 700 "${BUILDDIR}"/etc/rc.d/*
 
 
 
@@ -194,8 +200,8 @@ cat > "${BUILDDIR}"/etc/passwd << EOF
 root:x:0:0:root:/root:/bin/sh
 liveuser:x:1000:1000:Linux User,,,:/home/liveuser:/bin/sh
 EOF
-
-
+# This hardening switch needs to be fixed.
+#[ "$HARDEN" = "YES" ] && chmod 550 "${BUILDDIR}"/etc/passwd
 
 
 cat > "${BUILDDIR}"/etc/shadow << EOF
@@ -207,7 +213,7 @@ chmod 540 "${BUILDDIR}"/etc/shadow
 cat > "${BUILDDIR}"/root/.bashrc << EOF
 PS1="\[\033[35m\]\[\033[m\]\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[66;1m\]\w\[\033[m\]# "
 EOF
-
+[ "$HARDEN" = "YES" ] && chmod 400 "${BUILDDIR}"/root/.bashrc
 
 
 
@@ -267,14 +273,15 @@ MENU COLOR sel		7;37;40      #e0000000 #20ff8000 all
 UI menu.c32
 TIMEOUT 20 
 EOF
+[ "$HARDEN" = "YES" ] && chmod 500 "${DEVICMNT}"/boot/syslinux/extlinux.conf
 
 
 
-
-
+# KERNEL /boot/${KERNTYPE}-${KERNVERS}-${ARCHITEC}
+#KERNEL /boot/${KERNTYPE}-${KERNVERS}-${ARCHITEC}
 cat >> "${DEVICMNT}"/boot/syslinux/extlinux.conf <<EOF
 LABEL Statix Linux ${ARCHITEC} "/dev/sda"
-KERNEL /boot/${KERNTYPE}-${KERNVERS}-${ARCHITEC}
+KERNEL /boot/bzImage
 APPEND root=/dev/sda init=/sbin/init 
 EOF
 
@@ -296,18 +303,11 @@ EOF
 
 opendisk()
 {
-mkdir -p "${BUILDDIR}" "${DEVICMNT}" 2>/dev/null
-
-APROXSIZ=$(( (  $(du bin/dropbearmulti-${ARCHITEC}-musl | awk '{print $1}' ) + \
-$(du bin/${KERNTYPE}-${KERNVERS}-${ARCHITEC} | awk '{print $1}') + \
-$(du bin/busybox-1.22.1-${ARCHITEC}-musl | awk '{print $1}' ) ) * 2 ))
-
-dd if=/dev/zero of="statix-${ARCHITEC}-${VERSNUMB}.img" bs=1k count="${APROXSIZ}" 
-
+mkdir -p "${BUILDDIR}" "${DEVICMNT}" 2>/dev/null 
+APROXSIZ="10"
+dd if=/dev/zero of="statix-${ARCHITEC}-${VERSNUMB}.img" bs=2M count="${APROXSIZ}" 
 mkfs.ext4 -F "statix-${ARCHITEC}-${VERSNUMB}.img"
-mount "statix-${ARCHITEC}-${VERSNUMB}.img" "${DEVICMNT}"
-
-
+mount "statix-${ARCHITEC}-${VERSNUMB}.img" "${DEVICMNT}" 
 mkdir -p "${DEVICMNT}"/boot/syslinux
 cp /usr/lib/syslinux/menu.c32 "${DEVICMNT}"/boot/syslinux/
 extlinux --install "${DEVICMNT}"/boot/syslinux/ 
@@ -339,72 +339,43 @@ cp ngircd.conf "${BUILDDIR}"/etc/
 
 copykern()
 { 
-cp bin/"${KERNTYPE}"-"${KERNVERS}"-"${ARCHITEC}" "${DEVICMNT}"/boot/
-
+	echo ">>  DESTDIR=${DEVICMNT}/boot/"
+	echo "DESTDIR=${DEVICMNT}/boot/" >> config
+	./pkg install linux 
 }
 
 
 busyboxs()
-{
-#cp bin/busybox-1.22.1-"${ARCHITEC}"  "${BUILDDIR}"/sbin/busybox
+{ 
+	echo "DESTDIR=${DEVICMNT}/sbin/" >> config
+	./pkg install busybox
 
-cp bin/busybox-1.22.1-"${ARCHITEC}"-musl  "${BUILDDIR}"/sbin/busybox
-
-cd "${BUILDDIR}"/sbin
-./busybox --install .
-./busybox --install ../bin
-# Create some links in case busybox did not install correctly:
-ln busybox init   2>/dev/null
-ln busybox getty  2>/dev/null
-ln busybox mount  2>/dev/null
-cd "${BACKHOME}" 
+	cd "${BUILDDIR}"/sbin
+	./busybox --install .
+	./busybox --install ../bin
+	# Create some links in case busybox did not install correctly:
+	ln busybox init   2>/dev/null
+	ln busybox getty  2>/dev/null
+	ln busybox mount  2>/dev/null
+	cd "${BACKHOME}" 
 }
 
-
-initramf()
-{
-cd "${BUILDDIR}" 
-find -not -name "initramf*" -not -name "bz*" -not -name "init" | cpio -o -H newc | gzip > "${DEVICMNT}"/boot/initramfs.cpio
-
-cd "${BACKHOME}" 
-
-
-
-
-cat >> "${DEVICMNT}"/boot/syslinux/extlinux.conf <<EOF
-LABEL Statix Linux ${ARCHITEC} "initramfs.cpio"
-KERNEL /boot/${KERNTYPE}-${KERNVERS}-${ARCHITEC}
-INITRD /boot/initramfs.cpio
-APPEND root=/dev/sda  init=/sbin/initramfs_stx HOMPART="/dev/sdb"
-EOF
-
-
-cp tools/initramfs_stx "${DEVICMNT}"/sbin/ 
-
-}
-instller()
-{
-cp bin/parted-"${ARCHITEC}" "${BUILDDIR}"/bin/parted
-cp tools/statix-installer "${BUILDDIR}"/bin/
-mkdir -p "${BUILDDIR}"/etc/
-cp tools/statix-installer.conf "${BUILDDIR}"/etc/
-
-}
 
 sshserve()
-{
-#cp bin/dropbearmulti-"${ARCHITEC}" "${BUILDDIR}"/bin/dropbearmulti
-cp bin/dropbearmulti-"${ARCHITEC}"-musl "${BUILDDIR}"/bin/dropbearmulti
-cd "${BUILDDIR}"/bin
-strip dropbearmulti
-ln dropbearmulti dropbear
-ln dropbearmulti dropbearkey
-ln dropbearmulti dropbearconvert
-ln dropbearmulti ssh
-ln dropbearmulti dbclient
-ln dropbearmulti scp
-cd "${BACKHOME}"
-# ln dropbearmulti dropbear; ln dropbearmulti dropbearkey; ln dropbearmulti dropbearconvert; ln dropbearmulti ssh; ln dropbearmulti dbclient; ln dropbearmulti scp; dropbear -g -w -R -P
+{ 
+	echo "DESTDIR=${DEVICMNT}/bin/" >> config
+	./pkg install dropbear
+
+	cd "${BUILDDIR}"/bin
+	strip dropbearmulti
+	ln dropbearmulti dropbear
+	ln dropbearmulti dropbearkey
+	ln dropbearmulti dropbearconvert
+	ln dropbearmulti ssh
+	ln dropbearmulti dbclient
+	ln dropbearmulti scp
+	cd "${BACKHOME}"
+
 }
 
 
@@ -420,9 +391,8 @@ makebase
 configur
 copykern
 busyboxs
-sshserve
-initramf
-instller
+sshserve 
+
 closdisk
 
 

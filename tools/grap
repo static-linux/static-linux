@@ -1,9 +1,0 @@
-grap(){
-for i in `cat $2 || exit 1`
-do case "$i" in
-      "$i"*) echo $1
-            ;;
-   esac
-done
-
-
