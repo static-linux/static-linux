@@ -9,6 +9,7 @@
 
 
 
+
 # Aliases should be absolute paths names so as to prevent breakage.
 DEVICMNT="$(pwd)/control"
 
@@ -34,6 +35,13 @@ HARDEN=YES
 # clean up the build directory.
 rm -rf "${BUILDDIR}"
 
+# check for package manager
+if [ -f pkg ]
+then 	echo "pkg ok"
+	./pkg update
+else 	echo "pkg not found"
+	exit 
+fi
 
 configur()
 {
