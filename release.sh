@@ -305,12 +305,16 @@ makebase()
 	cd "${BACKHOME}"
 
 
-	cp -r lib/terminal/terminfo "${BUILDDIR}"/usr/share/ 
+	#cp -r lib/terminal/terminfo "${BUILDDIR}"/usr/share/ 
 	cp tools/* "${BUILDDIR}"/sbin
 	cp -r lib/system-skeleton/etc/udhcpc/default.script "${BUILDDIR}"/usr/share/udhcpc 
 	cp ngircd.conf "${BUILDDIR}"/etc/
 }
-
+install_terminfo()
+{
+	echo "DESTDIR=${DEVICMNT}/usr/share/" >> config
+        ./tools/pkg_stx install terminfo
+}
 
 install_kernel()
 { 
@@ -332,7 +336,12 @@ install_busybox()
 	ln busybox mount  2>/dev/null
 	cd "${BACKHOME}" 
 }
+install_htop()
+{
+	echo "DESTDIR=${DEVICMNT}/bin/" >> config
+        ./tools/pkg_stx install htop
 
+}
 
 install_ssh()
 { 
@@ -363,10 +372,12 @@ closdisk()
 # build
 opendisk
 makebase
+install_terminfo
 install_configuration
 install_kernel
 install_busybox
 install_ssh 
+install_htop
 closdisk
 
 
