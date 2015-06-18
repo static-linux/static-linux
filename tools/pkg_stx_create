@@ -89,7 +89,7 @@ do
            				else echo not an ELF
            			fi 
         		done
-        	fi 
+        	#fi 
 	
 
 
@@ -164,6 +164,8 @@ do
 			cd "${BILDPRNT}"
         		else echo ok
         	fi
+		# test fi !!
+		fi
 
 	esac 
 done
