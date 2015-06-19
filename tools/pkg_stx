@@ -48,7 +48,7 @@ case "$1" in
    search) 	grep "$2" "$MTADTA" 
            	;;
    update) 	#wget   "${MIRROR}/METADATA"  
-		wget  -O "$MTADTA"  "${MIRROR}/METADATA"
+		wget -O "$MTADTA"  "${MIRROR}/METADATA"
            	;;
       src) 	wget -qO- "${MIRROR}/${PKGNAM}.src" | tar xvf - || exit 1 
            	;;

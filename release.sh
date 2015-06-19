@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# Main wrapper script for the statix rewrite.
-# Runs as root from a debian wheezy host.
+# Make a release of static-linux
+# Runs as root from a debian wheezy host, other 
+# linuxes are probably fine as well
 
 
 
@@ -15,9 +16,6 @@ ARCHITEC=i386
 BACKHOME=$(pwd) 
 
 VERSNUMB=0.6.4 # version number for release 
-
-# chmod various files to harden security.
-HARDEN=YES 
 
 
 # clean up the build directory.
@@ -48,9 +46,7 @@ makebase()
 {
 	mkdir -p "${BUILDDIR}" 2>/dev/null
 	cp -r skeleton/* "${BUILDDIR}" 
-	
-}
-
+} 
 
 install_terminfo()
 {
@@ -62,47 +58,25 @@ install_kernel()
 { 
 	echo "DESTDIR=${DEVICMNT}/boot/" >> config
 	./tools/pkg_stx install linux 
-}
-
+} 
 
 install_busybox()
 { 
 	echo "DESTDIR=${DEVICMNT}/sbin/" >> config
-	./tools/pkg_stx install busybox
-
-	#cd "${BUILDDIR}"/sbin
-	#./busybox --install .
-	#./busybox --install ../bin 
-	#ln busybox init   2>/dev/null
-	#ln busybox getty  2>/dev/null
-	#ln busybox mount  2>/dev/null
-	#cd "${BACKHOME}" 
+	./tools/pkg_stx install busybox 
 }
+
 install_htop()
 {
 	echo "DESTDIR=${DEVICMNT}/bin/" >> config
-        ./tools/pkg_stx install htop
-
+        ./tools/pkg_stx install htop 
 }
 
 install_ssh()
 { 
 	echo "DESTDIR=${DEVICMNT}/bin/" >> config
-	./tools/pkg_stx install dropbear
-	
-
-	cd "${BUILDDIR}"/bin
-	strip dropbearmulti
-	ln dropbearmulti dropbear
-	ln dropbearmulti dropbearkey
-	ln dropbearmulti dropbearconvert
-	ln dropbearmulti ssh
-	ln dropbearmulti dbclient
-	ln dropbearmulti scp
-	cd "${BACKHOME}"
-
-}
-
+	./tools/pkg_stx install dropbear 
+} 
 
 closedisk()
 {
