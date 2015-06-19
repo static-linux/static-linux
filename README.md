@@ -1,6 +1,7 @@
 # static-linux
 
 tools/
+
   initramfs_stx 
   pkg_stx_create      
   statix-installer
