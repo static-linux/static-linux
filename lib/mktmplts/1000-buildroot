@@ -193,7 +193,7 @@ make_buildroot_expero()
 
 # this is a modularied 
 # system for applying bldrt configs
-if [[ -e "${work}"/x86_expero3 ]]
+if [ -e "${work}"/x86_expero3 ]
 then    echo ok 
 else    rsync -avP "${src}"/buildroot/ "${work}"/x86_expero3
 fi
@@ -245,18 +245,46 @@ BR2_CCACHE=y
 BR2_STATIC_LIBS=y
 EOF
 
-make my_defconfig
 
-make
+#make my_defconfig
+
+#make
+#exit
 
 
 COUNT="1"
 HOLD=`pwd`
-for q in `cat "${z}"/lib/bldrt/SMALL_REPO`
-do 	cat configs/my_defconfig > configs/my2_defconfig
-	echo "$q" >> configs/my2_defconfig
-	make my2_defconfig 
-	make 
+# `cat "${z}"/lib/bldrt/SMALL_REPO`
+for q in `cat "${z}"/lib/bldrt/STATIC_LIST`
+do 	
+	#NEWNAME="$( echo $q | sed 's|=.*||g' | sed 's|BR2_PACKAGE_||g' | tr A-Z a-z)"
+	
+	#mkdir -p "${z}/installed/${NEWNAME}"
+	#cat configs/my_defconfig > configs/my2_defconfig
+	echo "$q" >> lastpackage
+	#make my2_defconfig 
+	#cp -r output/target.bak/* output/target
+#	cp -r output/target output/target.bak
+	
+	
+	#mkdir output/target/
+	#make
+	
+	rm -rf output/target/ 
+	make "${q}-reinstall"
+	#make "${NEWNAME}-reinstall"
+	
+	#REALNAME=$( basename output/build/${NEWNAME}* )
+	REALNAME=$( basename output/build/${q}* )
+	mkdir -p "${z}/installed/${REALNAME}"
+	cp -r output/target/* "${z}/installed/${REALNAME}"
+	#cp -r output/target/* "${z}/installed/${NEWNAME}"
+	
+	
+	#rm -rf output/target/usr
+	#cp -r output/target.bak output/target/
+	#exit
+	
 done
 }
 

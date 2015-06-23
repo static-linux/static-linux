@@ -1,27 +1,45 @@
 #!/bin/sh
 
 # (C) 2014, pkg_stx, cgraf
-# A simple package manager for static binaries.
+# A simple package manager for static binaries.  
 
 
 WORKDR=$(pwd)/pkg_stx_work/ 
 MIRROR="https://raw.githubusercontent.com/static-linux/static-binaries-i386/master/"
+
+SOME="$(pwd)/config"
+[ -f "$SOME" ] && . "$SOME"
+
+
 MTADTA=$(pwd)/pkg_stx_work/METADATA
 DTABSE=$(pwd)/pkg_stx_database/
 PKGNAM=$( grep -o ${2}-'...*' $MTADTA | head -n 1) 
 
 
+LOCALPAKS="0"
 
-SOME="$(pwd)/config"
-[ -f "$SOME" ] && . "$SOME"
+if [ -d "${MIRROR}" ]
+then 	LOCALPAKS="1"
+fi
 
-mkdir -p "$WORKDR" "$DTABSE" 
+
+mkdir -p "$WORKDR" "$DTABSE"
+
+
 cd "$WORKDR"
 
 case "$1" in 
  download) 	wget "${MIRROR}/${PKGNAM}.tar.gz"
+		if [ "$LOCALPAKS" = "0" ]
+                then    wget "${MIRROR}/${PKGNAM}.tar.gz"
+                else    cp "${MIRROR}/${PKGNAM}.tar.gz" .
+                fi
           	;; 
-  install) 	wget -O- "${MIRROR}/${PKGNAM}.tar.gz" | gunzip -c | tar xf - || exit 1 
+  install) 	
+		if [ "$LOCALPAKS" = "0" ]
+		then 	wget -O- "${MIRROR}/${PKGNAM}.tar.gz" | gunzip -c | tar xf - || exit 1 
+		else	tar xf "${MIRROR}/${PKGNAM}.tar.gz" || exit 1
+		fi
 		mkdir -p "${DTABSE}/${PKGNAM}" 
 		cd "$PKGNAM" 
 		cp checksums "${DTABSE}/${PKGNAM}/checksums" 
@@ -47,10 +65,15 @@ case "$1" in
            	;;
    search) 	grep "$2" "$MTADTA" 
            	;;
-   update) 	#wget   "${MIRROR}/METADATA"  
-		wget -O "$MTADTA"  "${MIRROR}/METADATA"
+   update) 	if [ "$LOCALPAKS" = "0" ]
+		then 	wget -O "$MTADTA" "${MIRROR}/METADATA"
+		else	cp "${MIRROR}/METADATA" .
+		fi 
            	;;
-      src) 	wget -qO- "${MIRROR}/${PKGNAM}.src" | tar xvf - || exit 1 
+      src) 	if [ "$LOCALPAKS" = "0" ]
+                then	wget -qO- "${MIRROR}/${PKGNAM}.src" | tar xvf - || exit 1 
+		else    tar xf "${MIRROR}/${PKGNAM}.src" || exit 1
+                fi
            	;;
         *) 	echo "Usage: pkg_stx [update|install|search|remove] <package name>" 
            	;; 

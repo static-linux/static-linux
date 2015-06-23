@@ -7,19 +7,13 @@
 
 
 # Aliases should be absolute paths names so as to prevent breakage.
-DEVICMNT="$(pwd)/control"
-
-BUILDDIR="$(pwd)/control" 
-
-ARCHITEC=i386
-
-BACKHOME=$(pwd) 
+DEVICMNT="$(pwd)/control" 
 
 VERSNUMB=0.6.4 # version number for release 
 
 
 # clean up the build directory.
-rm -rf "${BUILDDIR}"
+rm -rf "${DEVICMNT}"
 
 # update the package manager
 if [ -f tools/pkg_stx ]
@@ -27,25 +21,15 @@ then 	echo "tools/pkg_stx ok"
 	./tools/pkg_stx update
 else 	echo "tools/pkg_stx not found"
 	exit 
-fi
+fi 
 
-opendisk()
+
+install_base()
 {
-	mkdir -p "${BUILDDIR}" "${DEVICMNT}" 2>/dev/null 
-	APROXSIZ="10"
-	dd if=/dev/zero of="statix-${ARCHITEC}-${VERSNUMB}.img" bs=2M count="${APROXSIZ}" 
-	mkfs.ext4 -F "statix-${ARCHITEC}-${VERSNUMB}.img"
-	mount "statix-${ARCHITEC}-${VERSNUMB}.img" "${DEVICMNT}" 
-	mkdir -p "${DEVICMNT}"/boot/syslinux
-	cp /usr/lib/syslinux/menu.c32 "${DEVICMNT}"/boot/syslinux/
-	extlinux --install "${DEVICMNT}"/boot/syslinux/ 
-}
-
-
-makebase()
-{
-	mkdir -p "${BUILDDIR}" 2>/dev/null
-	cp -r skeleton/* "${BUILDDIR}" 
+	mkdir -p "${DEVICMNT}" 
+	#cp -r skeleton/* "${DEVICMNT}" 
+	echo "DESTDIR=${DEVICMNT}/" >> config
+	./tools/pkg_stx install skeleton
 } 
 
 install_terminfo()
@@ -78,22 +62,28 @@ install_ssh()
 	./tools/pkg_stx install dropbear 
 } 
 
-closedisk()
-{
-	umount "${DEVICMNT}"
-}
 
 
-
-# build
-opendisk
-makebase
+install_base
 install_terminfo 
 install_kernel
 install_busybox
 install_ssh 
 install_htop
-closedisk
+
+
+# This remastery tool can be obtained from
+# https://github.com/cmgraff/backup however 
+# for now static-linux uses a slightly modified version
+
+
+./backup.sh \
+--root=control/ \
+--backup \
+--remaster \
+--size=2 \
+--image="static-linux-${VERSNUMB}.img" 
+
 
 
 
