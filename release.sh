@@ -27,7 +27,7 @@ fi
 install_base()
 {
 	mkdir -p "${DEVICMNT}" 
-	#cp -r skeleton/* "${DEVICMNT}" 
+	#cp -r skeleton-0.0.0/skeleton/* "${DEVICMNT}" 
 	echo "DESTDIR=${DEVICMNT}/" >> config
 	./tools/pkg_stx install skeleton
 } 
@@ -46,7 +46,8 @@ install_kernel()
 
 install_busybox()
 { 
-	echo "DESTDIR=${DEVICMNT}/sbin/" >> config
+	#echo "DESTDIR=${DEVICMNT}/sbin/" >> config
+	echo "DESTDIR=${DEVICMNT}/" >> config
 	./tools/pkg_stx install busybox 
 }
 
@@ -62,6 +63,18 @@ install_ssh()
 	./tools/pkg_stx install dropbear 
 } 
 
+install_file()
+{
+	echo "DESTDIR=${DEVICMNT}/" >> config
+        ./tools/pkg_stx install file
+}
+
+install_alsa()
+{
+        echo "DESTDIR=${DEVICMNT}/bin/" >> config
+        ./tools/pkg_stx install alsa-utils
+}
+
 
 
 install_base
@@ -70,6 +83,8 @@ install_kernel
 install_busybox
 install_ssh 
 install_htop
+install_file
+install_alsa
 
 
 # This remastery tool can be obtained from

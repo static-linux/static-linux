@@ -353,6 +353,7 @@ then 	# Get a list of useable directories
 	#SIZE=$(( $SIZE / 100000 ))
 	printf "size was %s\n" "$SIZE" 
 	
+	
 	# Determine archive type 
 	ARCHIVE="tar -c $DIRLIST" 
 	if [ "$ARCV" = "iso" ]
@@ -545,18 +546,18 @@ then
 		echo "MENU COLOR sel          7;37;40      #e0000000 #20ff8000 all" >> "${LOADERCONF}"
 
 		#printf "UI vesamenu.c32\n" >> "${LOADERCONF}" 
-		echo "UI menu.c32" >> "${LOADERCONF}"
-		printf "DEFAULT linux\n" >> "${LOADERCONF}" 
-		printf "TIMEOUT 0\n" >> "${LOADERCONF}" 
-		printf "PROMPT 0\n" >> "${LOADERCONF}" 
-		printf "LABEL Backup\n" >> "${LOADERCONF}" 
-		printf "kernel %s\n" "${KERNEL}" >> "${LOADERCONF}"
-		printf "APPEND " >> "${LOADERCONF}"
-		if ! [ -z "$INITRD" ]
-		then 	printf "initrd=%s " "${INITRD}" >> "${LOADERCONF}"
-		fi 
+		echo "UI menu.c32"      >> "${LOADERCONF}"
+		echo "DEFAULT linux"    >> "${LOADERCONF}"
+		echo "TIMEOUT 0"        >> "${LOADERCONF}"
+		echo "PROMPT 0"         >> "${LOADERCONF}"
+		echo "LABEL Backup"     >> "${LOADERCONF}" 
+		echo "kernel ${KERNEL}" >> "${LOADERCONF}"
 		
-		printf "root=%s \n" "${DEVICE}" >> "${LOADERCONF}"
+		echo -n "APPEND "       >> "${LOADERCONF}"
+		if ! [ -z "$INITRD" ]
+		then 	echo -n "initrd=${INITRD} " >> "${LOADERCONF}"
+		fi 
+		echo "root=${DEVICE}"   >> "${LOADERCONF}" 
 	fi
 
 	# grub configuration file

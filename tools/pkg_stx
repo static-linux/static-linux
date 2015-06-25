@@ -2,6 +2,25 @@
 
 # (C) 2014, pkg_stx, cgraf
 # A simple package manager for static binaries.  
+pkggrep()
+{
+        for i in $(while read -r j
+                do      printf '%s\n' "$j"
+                done < ${2})
+        do
+                case "$i" in
+                        ${1}* )
+                                printf '%s\n' "$i"
+                                break
+                                ;;
+                        *)
+                                ;;
+                esac
+        done
+}
+
+#pkggrep "$1" "$2"
+
 
 
 WORKDR=$(pwd)/pkg_stx_work/ 
@@ -13,7 +32,13 @@ SOME="$(pwd)/config"
 
 MTADTA=$(pwd)/pkg_stx_work/METADATA
 DTABSE=$(pwd)/pkg_stx_database/
-PKGNAM=$( grep -o ${2}-'...*' $MTADTA | head -n 1) 
+#PKGNAM=$( grep -o  "^${2}-...*" $MTADTA | head -n 1) 
+#PKGNAM=$( grep "${2}-...*" $MTADTA | head -n 1)
+PKGNAM=$( pkggrep ${2} $MTADTA )
+
+
+
+
 
 
 LOCALPAKS="0"
