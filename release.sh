@@ -97,7 +97,10 @@ install_alsa
 --backup \
 --remaster \
 --size=2 \
---image="static-linux-${VERSNUMB}.img" 
+--image="static-linux-${VERSNUMB}.img" \
+--title=static-linux-${VERSNUMB} \
+--bootld=grub
+
 
 
 

@@ -25,6 +25,7 @@ TARBALL="${NAME}.${ARCV}.${SUFX}"
 BOOTLOADER="syslinux" 
 QUICKTEST="0"
 TOOLS="du dd parted losetup "
+TITLE="Remastered backup"
 
 # functions
 unmount()
@@ -195,7 +196,9 @@ help()
 	printf "        --root=         source dir            '%s'\n" "${ARROOT}"
 	printf "        --bootld=       grub|syslinux         '%s'\n" "${BOOTLOADER}" 
 	printf "        --whome         Include /home\n"
-	printf "        --help          Display this menu\n\n"
+	printf "        --help          Display this menu\n"
+	echo "        --title=        Title of remastered image"
+	echo
 	printf "Perform a system backup of \"/\":\n"
 	printf "  backup --backup\n\n"
         printf "Restore from an existing backup:\n"
@@ -284,6 +287,9 @@ do
 		BOOTLOADER="${1#*=}"
 		checkconfig
                 ;;
+	--title=*)
+		TITLE="${1#*=}"
+		;;
 		*)
 		printf "%s not found!\n" "$1" 
 		printf "Try \`backup --help' for more information.\n" 
@@ -550,7 +556,7 @@ then
 		echo "DEFAULT linux"    >> "${LOADERCONF}"
 		echo "TIMEOUT 0"        >> "${LOADERCONF}"
 		echo "PROMPT 0"         >> "${LOADERCONF}"
-		echo "LABEL Backup"     >> "${LOADERCONF}" 
+		echo "LABEL ${TITLE}"   >> "${LOADERCONF}" 
 		echo "kernel ${KERNEL}" >> "${LOADERCONF}"
 		
 		echo -n "APPEND "       >> "${LOADERCONF}"
@@ -566,7 +572,7 @@ then
 		mkdir -p boot/newgrub/grub 
 		LOADERCONF="boot/newgrub/grub/grub.cfg"
 		printf "set timeout=5\n" >> "${LOADERCONF}" 
-		printf "menuentry \"Backup\" {\n" >> "${LOADERCONF}" 
+		printf "menuentry \"${TITLE}\" {\n" >> "${LOADERCONF}" 
 		printf "set root=(hd0,msdos1)\n" >> "${LOADERCONF}"
 		printf "linux %s " "${KERNEL}">> "${LOADERCONF}"
 		if ! [ -z "$INITRD" ]
