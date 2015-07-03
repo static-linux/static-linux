@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Statix linux
-# (C) 2013-2014  cgraf GPL license
+# Static-linux
+# (C) 2013-2014, 2015  cgraf GPL license
 # This script organizes and automates all other aspects of the
 # build process by sourcing various function libraries from
 # "lib/*tmplts/????-*".
@@ -14,7 +14,7 @@ initialize
 # exec 1> log.txt
 
 
-# Set cross compiling environment.
+
 
 dog()
 { 
@@ -54,8 +54,6 @@ get_buildroot
 #get_rsync
 #get_nano
 EOF`
-
-# 
 do case $i in
    \#*) ;;
      *) j="${src}/$(echo $i|sed "s|get_||g")"

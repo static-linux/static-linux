@@ -45,10 +45,32 @@ then    echo ok
 else    rsync -avP "${src}"/buildroot/ "${work}"/x86_64_xorg
 fi
 cd "${work}"/x86_64_xorg 
+
+
+
+
+
+#cat > configs/my_defconfig << EOF
+#BR2_x86_64=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+
+
+
+#BR2_LINUX_KERNEL=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION=y
+#BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.0.5"
+#BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+#BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
+#BR2_LINUX_KERNEL_INSTALL_TARGET=y
+
 cat > configs/my_defconfig << EOF
-BR2_x86_64=y
+BR2_x86=y
+BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
-BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="3.14.4"
+BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.1"
+BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/MYCONFIG"
 BR2_CCACHE=y
 BR2_TARGET_ROOTFS_CPIO=y
 BR2_JLEVEL=$(grep -c ^processor /proc/cpuinfo)
@@ -80,6 +102,7 @@ BR2_PACKAGE_NCURSES_TARGET_PANEL=y
 BR2_PACKAGE_NCURSES_TARGET_FORM=y
 BR2_PACKAGE_NCURSES_TARGET_MENU=y
 BR2_PACKAGE_ALSA_UTILS=y
+BR2_PACKAGE_MPG123=y
 EOF
 make my_defconfig
 make
@@ -225,9 +248,11 @@ cd "${work}"/x86_expero3
 #BR2_PACKAGE_DROPBEAR=y
 #EOF
 #cp "${z}/lib/busybox-defconfigs/busybox.defconfig" package/busybox/busybox-1.22.x.config
-cp "${z}/lib/busybox-defconfigs/busybox.defconfig" package/busybox/busybox-1.23.x.config
+#cp "${z}/lib/busybox-defconfigs/busybox.defconfig" package/busybox/busybox-1.23.x.config
+#cp "${z}/lib/busybox-defconfigs/BUSYBOXLARGE" package/busybox/busybox-1.23.x.config
 
 
+#BR2_PACKAGE_BUSYBOX_CONFIG="${z}/lib/busybox-defconfigs/busybox.defconfig"
 
 
 cat >> configs/my_defconfig <<EOF
@@ -239,6 +264,7 @@ BR2_LINUX_KERNEL_CUSTOM_VERSION=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.0.5"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
 BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
+BR2_PACKAGE_BUSYBOX_CONFIG="${z}/lib/busybox-defconfigs/newconfig"
 BR2_DL_DIR="/home/blakor/.bldroot"
 BR2_JLEVEL=8
 BR2_CCACHE=y
@@ -247,7 +273,9 @@ EOF
 
 
 #make my_defconfig
-
+#make busybox-menuconfig
+#make busybox-reconfigure
+#make busybox-resinstall
 #make
 #exit
 
@@ -280,7 +308,7 @@ do
 	cp -r output/target/* "${z}/installed/${REALNAME}"
 	#cp -r output/target/* "${z}/installed/${NEWNAME}"
 	
-	
+#	exit
 	#rm -rf output/target/usr
 	#cp -r output/target.bak output/target/
 	#exit

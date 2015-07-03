@@ -387,7 +387,7 @@ then 	cdwrap "$START"
 	
 	SIZE=${SIZE:="50"} 
 	mkdir -p "$RPATH" 
-	dd if=/dev/zero of="${IMAGE}" bs=100M count="${SIZE}"
+	dd if=/dev/zero of="${IMAGE}" bs=10M count="${SIZE}"
 	[ "$?" != "0" ] && error
 
 	# partition 
@@ -474,18 +474,22 @@ then
 	cdwrap "$RPATH" 
 
 	# Use dhcp-client at startup:
-	cp etc/network/interfaces etc/network/interfaces.last
-	printf "auto lo\n" > etc/network/interfaces 
-	printf "iface lo inet loopback\n" >> etc/network/interfaces 
-	printf "allow-hotplug eth0\n" >> etc/network/interfaces 
-	printf "iface eth0 inet dhcp\n" >> etc/network/interfaces
+	if [ -e etc/network/interfaces ]
+	then 	cp etc/network/interfaces etc/network/interfaces.last
+	fi
+	echo "auto lo" > etc/network/interfaces 
+	echo "iface lo inet loopback" >> etc/network/interfaces 
+	echo "allow-hotplug eth0" >> etc/network/interfaces 
+	echo "iface eth0 inet dhcp" >> etc/network/interfaces
 
-	# Overide the fstab to use the binary.img as /
-	cp etc/fstab etc/fstab.last 
-	
+	# Overide the fstab to use the binary.img as / 
+	if [ -e etc/fstab ]
+        then    cp etc/fstab etc/fstab.last
+        fi 
 	DEVICE="/dev/sda1"
-	printf "%s / %s errors=remount-ro 0 1\n" "$DEVICE" "$FS" > etc/fstab 
-	printf "tmpfs /tmp tmpfs defaults 0 0 \n" >> etc/fstab 
+	echo "$DEVICE / $FS errors=remount-ro 0 1" > etc/fstab 
+	echo "tmpfs /tmp tmpfs defaults 0 0"       >> etc/fstab 
+	echo "proc /proc proc defaults 0 0"        >> etc/fstab
 	mkdir -p proc tmp sys dev/shm boot 
 
 	
@@ -545,11 +549,11 @@ then
 		cp /usr/lib/syslinux/menu.c32 .
 		LOADERCONF="syslinux.cfg" 
 		echo > "${LOADERCONF}"
-		echo "MENU COLOR screen       30;40        #40000000 #00000000 std" >> "${LOADERCONF}"
-		echo "MENU COLOR title        37;40        #40000000 #00000000 std" >> "${LOADERCONF}"
-		echo "MENU COLOR border       30;40        #40000000 #00000000 std" >> "${LOADERCONF}"
-		echo "MENU COLOR unsel        37;40        #40000000 #00000000 std" >> "${LOADERCONF}"
-		echo "MENU COLOR sel          7;37;40      #e0000000 #20ff8000 all" >> "${LOADERCONF}"
+		echo "MENU COLOR screen 30;40   #40000000 #00000000 std" >> "${LOADERCONF}"
+		echo "MENU COLOR title  37;40   #40000000 #00000000 std" >> "${LOADERCONF}"
+		echo "MENU COLOR border 30;40   #40000000 #00000000 std" >> "${LOADERCONF}"
+		echo "MENU COLOR unsel  37;40   #40000000 #00000000 std" >> "${LOADERCONF}"
+		echo "MENU COLOR sel    7;37;40 #e0000000 #20ff8000 all" >> "${LOADERCONF}"
 
 		#printf "UI vesamenu.c32\n" >> "${LOADERCONF}" 
 		echo "UI menu.c32"      >> "${LOADERCONF}"

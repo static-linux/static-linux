@@ -9,7 +9,7 @@
 # Aliases should be absolute paths names so as to prevent breakage.
 DEVICMNT="$(pwd)/control" 
 
-VERSNUMB=0.6.4 # version number for release 
+VERSNUMB=0.6.5 # version number for release 
 
 
 # clean up the build directory.
@@ -57,7 +57,7 @@ install_htop()
         ./tools/pkg_stx install htop 
 }
 
-install_ssh()
+install_dropbear()
 { 
 	echo "DESTDIR=${DEVICMNT}/bin/" >> config
 	./tools/pkg_stx install dropbear 
@@ -78,16 +78,16 @@ install_alsa()
 
 
 install_base
+install_busybox
 install_terminfo 
 install_kernel
-install_busybox
-install_ssh 
 install_htop
-install_file
-install_alsa
+install_dropbear
 
 
-# This remastery tool can be obtained from
+
+
+# This remastery tool "backup.sh" can be obtained from
 # https://github.com/cmgraff/backup however 
 # for now static-linux uses a slightly modified version
 
@@ -98,8 +98,8 @@ install_alsa
 --remaster \
 --size=2 \
 --image="static-linux-${VERSNUMB}.img" \
---title=static-linux-${VERSNUMB} \
---bootld=grub
+--title=static-linux-i386-${VERSNUMB} 
+
 
 
 

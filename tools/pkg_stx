@@ -2,54 +2,54 @@
 
 # (C) 2014, pkg_stx, cgraf
 # A simple package manager for static binaries.  
+
+
+WORKDR=$(pwd)/pkg_stx_data/work/ 
+MIRROR="https://raw.githubusercontent.com/static-linux/static-binaries-i386/master/"
+
+CFIGOVERRIDE="$(pwd)/config" 
+
+MTADTA=$(pwd)/pkg_stx_data/work/METADATA
+DTABSE=$(pwd)/pkg_stx_data/database/
+
+LOCALPAKS="0"
+PKGNAM=""
+
+getline()
+{
+        while read -r j
+        do      printf '%s\n' "$j"
+        done
+}
+
 pkggrep()
 {
-        for i in $(while read -r j
-                do      printf '%s\n' "$j"
-                done < ${2})
+        for i in $(getline < ${2})
         do
                 case "$i" in
                         ${1}* )
                                 printf '%s\n' "$i"
                                 break
                                 ;;
-                        *)
-                                ;;
                 esac
         done
-}
-
-#pkggrep "$1" "$2"
+} 
 
 
+if [ -f "$CFIGOVERRIDE" ]
+then	. "$CFIGOVERRIDE"
+fi
 
-WORKDR=$(pwd)/pkg_stx_work/ 
-MIRROR="https://raw.githubusercontent.com/static-linux/static-binaries-i386/master/"
-
-SOME="$(pwd)/config"
-[ -f "$SOME" ] && . "$SOME"
-
-
-MTADTA=$(pwd)/pkg_stx_work/METADATA
-DTABSE=$(pwd)/pkg_stx_database/
-#PKGNAM=$( grep -o  "^${2}-...*" $MTADTA | head -n 1) 
-#PKGNAM=$( grep "${2}-...*" $MTADTA | head -n 1)
-PKGNAM=$( pkggrep ${2} $MTADTA )
-
-
-
-
-
-
-LOCALPAKS="0"
+if [ -f $MTADTA ]
+then 	PKGNAM=$( pkggrep ${2} $MTADTA ) 
+fi
 
 if [ -d "${MIRROR}" ]
 then 	LOCALPAKS="1"
 fi
 
 
-mkdir -p "$WORKDR" "$DTABSE"
-
+mkdir -p "$WORKDR" "$DTABSE" 
 
 cd "$WORKDR"
 
@@ -69,7 +69,7 @@ case "$1" in
 		cd "$PKGNAM" 
 		cp checksums "${DTABSE}/${PKGNAM}/checksums" 
 		. "${WORKDR}/${PKGNAM}/checksums" 
-		[ -f "$SOME" ] && . "$SOME"
+		[ -f "$CFIGOVERRIDE" ] && . "$CFIGOVERRIDE"
 		installd 
 		cd "$WORKDR" 
 		A=$( md5sum "${PKGNAM}/${2}" | awk '{ print $1}' ) 
@@ -88,11 +88,11 @@ case "$1" in
            	else 	echo "Does not appear to have been installed by pkg_stx"
            	fi
            	;;
-   search) 	grep "$2" "$MTADTA" 
+   search) 	pkggrep "$2" "$MTADTA" 
            	;;
    update) 	if [ "$LOCALPAKS" = "0" ]
 		then 	wget -O "$MTADTA" "${MIRROR}/METADATA"
-		else	cp "${MIRROR}/METADATA" .
+		else	cp "${MIRROR}/METADATA" .  
 		fi 
            	;;
       src) 	if [ "$LOCALPAKS" = "0" ]
