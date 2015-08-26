@@ -10,9 +10,10 @@ Releases of static-linux can be found here:
 
 
 
+
 Everything is a package as far as static-linux is concerned.
-This being the case, the system skeleton itself is also a
-package and can be found in the repository corresponding to 
+For example, the system skeleton itself is also a package 
+and can be found in the repository corresponding to 
 the machine architecture and release code name.
 
 

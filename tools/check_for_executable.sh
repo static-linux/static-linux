@@ -2,24 +2,25 @@
 
 USERPATH="$1"
 
-[ -d "$USERPATH" ] || { echo "$USERPATH not found" ; exit 1 ; }
+if ! [ -d "$USERPATH" ] 
+then 	echo "$USERPATH not found"
+	exit 1
+fi 
 
 for i in $USERPATH/* 
-do	#echo "$i"
-	SWITCH="0"
+do	SWITCH="0"
 	for j in $i/* $i/*/* $i/*/*/* $i/*/*/*/* $i/*/*/*/*/*
-	do	#echo "$j"
+	do	
 		[ -x "$j" ] && SWITCH="1"
 	done
 	if [ "$SWITCH" = "1" ]
-	then 	#echo "exe found!"
+	then 	
 		echo -n ". "
 	else	echo
 		echo "$i NOT EXE BAD DIR DELETING IT!"
 		rm -rf "$i"
-	fi
-	#echo new dir
-done
-
+	fi 
+done 
 
 echo
+

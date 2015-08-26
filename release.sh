@@ -92,7 +92,7 @@ install_dropbear
 # for now static-linux uses a slightly modified version
 
 
-./backup.sh \
+./remaster.sh \
 --root=control/ \
 --backup \
 --remaster \

@@ -255,6 +255,9 @@ cd "${work}"/x86_expero3
 #BR2_PACKAGE_BUSYBOX_CONFIG="${z}/lib/busybox-defconfigs/busybox.defconfig"
 
 
+
+# 
+
 cat >> configs/my_defconfig <<EOF
 BR2_x86=y
 BR2_TOOLCHAIN_BUILDROOT_MUSL=y
@@ -263,8 +266,7 @@ BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION=y
 BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE="4.0.5"
 BR2_LINUX_KERNEL_USE_CUSTOM_CONFIG=y
-BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="${z}/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
-BR2_PACKAGE_BUSYBOX_CONFIG="${z}/lib/busybox-defconfigs/newconfig"
+BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE="/home/blakor/cmgraff/static-linux/lib/linux-defconfigs/linux-3.14.4-i386_defconfig"
 BR2_DL_DIR="/home/blakor/.bldroot"
 BR2_JLEVEL=8
 BR2_CCACHE=y
@@ -272,12 +274,18 @@ BR2_STATIC_LIBS=y
 EOF
 
 
-#make my_defconfig
+#BR2_PACKAGE_BUSYBOX_CONFIG="${z}/lib/busybox-defconfigs/newconfig"
+
+
+
+
 #make busybox-menuconfig
 #make busybox-reconfigure
 #make busybox-resinstall
-#make
-#exit
+#make menuconfig
+make my_defconfig 
+make
+exit
 
 
 COUNT="1"
